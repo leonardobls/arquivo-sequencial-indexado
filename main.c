@@ -120,9 +120,43 @@ void exibeDadosArquivoBinario(){  setlocale(LC_ALL, "Portuguese");
 
 //-------------------------------------------------------------
 
-// void pesquisaBinariaSimples(){
-//     FILE *arquivo
-// }
+void pesquisaBinariaSimples(){
+
+    int id;
+    printf("Digite o id que você deseja buscar: ");
+    scanf("%d", &id);
+
+
+    FILE *arquivo = fopen("arquivoBinarioIndexado.bin", "rb");
+
+    if(arquivo == NULL){
+        printf("Não foi possível abrir o arquivo!\n");
+    }
+
+    int inicio, meio, fim;
+
+    inicio = 0;
+    fim = 19;
+
+    CITY city;
+
+    while(inicio <= fim){
+        meio = (inicio+fim) / 2;
+        fseek(arquivo, meio * sizeof(CITY), SEEK_SET);
+        fread(&city, sizeof(CITY), 1, arquivo);
+        if(id > city.id){
+            inicio = meio+1;
+        }else{
+            if(id < city.id){
+                fim = meio - 1;
+            }else{
+                
+                printf("%d", city.id);
+                break;
+            }
+        }
+    }
+}
 
 //-------------------------------------------------------------
 
@@ -151,7 +185,7 @@ int main(){  setlocale(LC_ALL, "Portuguese");
                 break;
             
             case 2 :
-                // pesquisaBinariaSimples();
+                pesquisaBinariaSimples();
                 break;
 
              case 3 :
