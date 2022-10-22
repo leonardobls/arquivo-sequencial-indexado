@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <string.h>
 #include <locale.h>
@@ -18,12 +19,21 @@ typedef struct city{
     float longitude;
 }CITY;
 
+
+typedef struct city_pesquisa{
+    int id;
+    long posicao;
+}CITY_INDEX;
+
 //-------------------------------------------------------------
 
 void exibeOpcoes(){  setlocale(LC_ALL, "Portuguese");
     printf("\n1 - Listar todos os registros.\n");
     printf("2 - Realizar a pesquisa binária.\n");
-    printf("3 - Sair.\n\n");
+    printf("3 - Pesquisar id do item pelo arquivo de indices.\n");
+    printf("4 - Sair.\n\n");
+
+
 }
 
 //-------------------------------------------------------------
@@ -39,10 +49,9 @@ void criaArquivoBinarioIndexadoOrdenado(FILE *arquivo){  setlocale(LC_ALL, "Port
     char row[VARCHAR];
     char *value;
     CITY city;
-    
+
     int i = 0;
     while(fgets(row, VARCHAR, arquivo) != NULL){
-
         if(i > 0 && i <= 100000){
             char *column = strtok(row, ",");
 
@@ -52,11 +61,11 @@ void criaArquivoBinarioIndexadoOrdenado(FILE *arquivo){  setlocale(LC_ALL, "Port
                 if(j == 0){
                     // printf("country %s\n", column);
                     strcpy(city.country, column);
-                } 
+                }
                 else if(j == 1){
                     // printf("city %s\n", column);
                     strcpy(city.name, column);
-                } 
+                }
                 else if(j == 2){
                     // printf("acce %s\n", column);
                     strcpy(city.accentCity, column);
@@ -77,7 +86,7 @@ void criaArquivoBinarioIndexadoOrdenado(FILE *arquivo){  setlocale(LC_ALL, "Port
                     // printf("long %s\n", column);
                     city.longitude = atof(column);
                 }
-                
+
                 column = strtok(NULL, ",");
                 j++;
             }
@@ -89,6 +98,102 @@ void criaArquivoBinarioIndexadoOrdenado(FILE *arquivo){  setlocale(LC_ALL, "Port
 
     fclose(arquivo);
     fclose(arquivoBinario);
+
+}
+//-------------------------------------------------------------
+
+void criarArquivoIndexSequencial(){
+
+    char *value;
+    char row[VARCHAR];
+    long posicao, pula = 0;
+
+    FILE * arquivoDados =  fopen("arquivoBinarioIndexado.bin", "rb");
+    FILE * arquivoIndex = fopen("arquivoIndex_campo1.bin", "wb");
+
+    CITY dados;
+    CITY_INDEX index;
+
+    while(fread(&dados, sizeof(CITY), 1, arquivoDados) != NULL){
+
+        if(pula == 0){
+            pula++;
+            continue;
+        }
+
+        if(!feof(arquivoDados)){
+            posicao = ftell(arquivoDados) - sizeof(CITY);
+            //posicao = ftell(arquivoDados));
+            index.id = dados.id;
+            index.posicao = posicao;
+
+            //printf("ITEM: %d e posicao %ld \n", index.id, index.posicao);
+        }
+
+        fwrite(&index, sizeof(CITY_INDEX), 1, arquivoIndex);
+    }
+
+    fclose(arquivoDados);
+    fclose(arquivoIndex);
+
+}
+//-------------------------------------------------------------
+
+void mostraItem(long posicao){
+
+    FILE * arquivoDados;
+    CITY city;
+
+    arquivoDados = fopen("arquivoBinarioIndexado.bin","rb");
+    fseek(arquivoDados, posicao, SEEK_SET);
+
+    fread(&city, sizeof(CITY), 1, arquivoDados);
+    fclose(arquivoDados);
+    printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %f\nLatitude: %f\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
+
+
+}
+//-------------------------------------------------------------
+
+void pesquisaBinariaIndex(){
+    int id;
+    printf("Digite o id que você deseja buscar: ");
+    scanf("%d", &id);
+
+
+    FILE *arquivo = fopen("arquivoIndex_campo1.bin", "rb");
+
+    if(arquivo == NULL){
+        printf("Não foi possível abrir o arquivo!\n");
+    }
+
+    int inicio, meio, fim;
+
+    inicio = 0;
+    fim = 19;
+
+    // printf("%d", fim);
+
+    CITY_INDEX index;
+
+    while(inicio <= fim){
+        meio = (inicio+fim) / 2;
+        fseek(arquivo, meio * sizeof(CITY_INDEX), SEEK_SET);
+        fread(&index, sizeof(CITY_INDEX), 1, arquivo);
+        if(id > index.id){
+            inicio = meio+1;
+        }else{
+            if(id < index.id){
+                fim = meio - 1;
+            }else{
+                mostraItem(index.posicao);
+                // printf("\t%d\n", index.id);
+                break;
+            }
+        }
+    }
+
+    fclose(arquivo);
 
 }
 
@@ -114,7 +219,7 @@ void exibeDadosArquivoBinario(){  setlocale(LC_ALL, "Portuguese");
     }
 
     printf("-------------------------------------------");
-    fclose(arquivo); 
+    fclose(arquivo);
 
 }
 
@@ -150,18 +255,20 @@ void pesquisaBinariaSimples(){
             if(id < city.id){
                 fim = meio - 1;
             }else{
-                
-                printf("%d", city.id);
-                break;
+
+            printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %f\nLatitude: %f\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
+            break;
             }
         }
     }
+
+    fclose(arquivo);
 }
 
 //-------------------------------------------------------------
 
 int main(){  setlocale(LC_ALL, "Portuguese");
-    
+
     FILE *arquivoOriginal = fopen("teste.csv", "r");
 
     if(arquivoOriginal == NULL){
@@ -170,30 +277,43 @@ int main(){  setlocale(LC_ALL, "Portuguese");
 
     criaArquivoBinarioIndexadoOrdenado(arquivoOriginal);
 
-    int valor; 
-    int controller = 1; 
+    // FILE *teste = fopen("arquivoIndex_campo1.bin", "rb");
+
+    // criarArquivoIndexSequencial();
+
+    // CITY_INDEX key;
+
+    // while(fread(&key, sizeof(CITY_INDEX), 1, teste) != NULL){
+    //     printf("%d\n", key.id);
+    // }
+
+    int valor;
+    int controller = 1;
 
     while(controller){
         printf ("\n\nEscolha uma opção abaixo: ");
         exibeOpcoes();
         scanf("%d", &valor);
-    
+
         switch ( valor )
         {
             case 1 :
                 exibeDadosArquivoBinario();
                 break;
-            
+
             case 2 :
                 pesquisaBinariaSimples();
                 break;
 
-             case 3 :
+            case 3:
+                pesquisaBinariaIndex();
+                break;
+
+             case 4 :
                 controller = 0;
                 printf("Tchauzin :)\n");
                 break;
         }
     }
-    
     return 0;
 }
