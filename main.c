@@ -49,14 +49,14 @@ typedef struct lista{
 
 void exibeOpcoes(){  setlocale(LC_ALL, "Portuguese");
 
-    printf("\n\n-----------------------------------------------\n");
+    printf("\n\n---------------*** QUADRO DE OPERACOES ***---------------\n");
     printf("1 - Listar todos os registros.\n");
     printf("2 - Realizar a pesquisa binária.\n");
     printf("3 - Pesquisar id do item pelo arquivo de indices.\n");
     printf("4 - Pesquisar cidade pelo nome.\n");
-    printf("5 - Ver cidades pertencentes ao mesmo pais.\n");
-    printf("6 - Sair.\n");
-    printf("-----------------------------------------------\n");
+    printf("5 - Ver cidades pertencentes ao mesmo pais.\n\n");
+    printf("0 - Sair.\n");
+    printf("---------------------------------------------------------\n");
 }
 
 //-------------------------------------------------------------
@@ -166,7 +166,7 @@ void exibeDadosArquivoBinario(){  setlocale(LC_ALL, "Portuguese");
 
 void pesquisaBinariaSimples(){
 
-    int id;
+    int id, valor;
     printf("Digite o id que você deseja buscar: ");
     scanf("%d", &id);
 
@@ -194,11 +194,72 @@ void pesquisaBinariaSimples(){
                 fim = meio - 1;
             }else{
 
-            printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %f\nLatitude: %f\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
-            break;
+                while(1){
+
+                    printf("\nEscolha uma das opções para pesquisar: \n\n");
+                    printf("------------------------------------------------------\n");
+                    printf("1 - Qual é o número de habitantes dessa cidade?\n");
+                    printf("2 - Qual é a longitude e latitude dessa cidade no globo?\n");
+                    printf("3 - Qual é o país dessa cidade?\n");
+                    printf("4 - Qual é o sotaque dessa cidade?\n\n");
+                    printf("0 - Cancelar a pesquisa\n");
+                    printf("------------------------------------------------------\n\n");
+
+
+                    while(scanf("%d", &valor) != NULL){
+
+                        if(valor >= 0 && valor <= 4){
+                            break;
+                        }else{
+                            printf("Digite um valor de 0 a 4!!\n\n");
+                        }
+                    }
+
+
+                    switch ( valor ){
+                        case 1 :
+                            if(city.population != NULL){
+                                printf("\t***Resposta: São %s habitantes\n", city.population);
+                            }else{
+                                printf("\t***Resposta: O número de habitantes não consta no registro! \n");
+                            }
+                            break;
+
+                        case 2 :
+                            if(city.latitude != NULL && city.longitude != NULL){
+                                printf("\t***Resposta: Para o exio x temos uma latitude de %s\nPara o eixo y temos uma longitude de %s\n", city.latitude, city.longitude);
+                            }else{
+                                printf("\t***Resposta: A informação solicitada não consta no registro! \n");
+                            }
+                            break;
+
+                        case 3:
+                            if(city.country != NULL){
+                                printf("\t***Resposta: A sigla do país é %s\n", city.country);
+                            }else{
+                                printf("\t***Resposta: A informação solicitada não consta no registro! \n");
+                            }
+                            break;
+
+                        case 4:
+                            if(city.country != NULL){
+                                printf("\t***Resposta: O sotaque dessa cidade é denomindado de %s\n", city.accentCity);
+                            }else{
+                                printf("\t***Resposta: A informação solicitada não consta no registro! \n");
+                            }
+                            break;
+
+                        case 0:
+                            break;
+                    }
+                }
+
+                break;
             }
         }
     }
+
+    printf("Não foi encontrado nenhum registro!\n");
 
     fclose(arquivo);
 }
@@ -506,9 +567,17 @@ int main(){  setlocale(LC_ALL, "Portuguese");
     int controller = 1;
 
     while(controller){
+        
         printf ("\n\nEscolha uma opção abaixo: ");
         exibeOpcoes();
-        scanf("%d", &valor);
+        
+        while(scanf("%d", &valor) != NULL){
+            if(valor >= 0 && valor <= 5){
+                break;
+            }else{
+                printf("Por favor, insira um número de 0 a 5!\n");
+            }
+        }
 
         switch ( valor )
         {
@@ -532,7 +601,7 @@ int main(){  setlocale(LC_ALL, "Portuguese");
                 imprimir(&lista);
                 break;
 
-             case 6:
+             case 0:
                 controller = 0;
                 printf("Tchauzin :)\n");
                 break;
