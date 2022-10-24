@@ -15,8 +15,8 @@ typedef struct city{
     char accentCity[VARCHAR];
     char region[VARCHAR];
     char population[VARCHAR];
-    float latitude;
-    float longitude;
+    char latitude[VARCHAR];
+    char longitude[VARCHAR];
 }CITY;
 
 
@@ -59,32 +59,33 @@ void criaArquivoBinarioIndexadoOrdenado(FILE *arquivo){  setlocale(LC_ALL, "Port
              while( column != NULL ) {
                 city.id = i;
                 if(j == 0){
-                    // printf("country %s\n", column);
-                    strcpy(city.country, column);
+                    printf("country %s\n", column);
+                    if(column != ',') strcpy(city.country, column);
                 }
                 else if(j == 1){
-                    // printf("city %s\n", column);
-                    strcpy(city.name, column);
+                    printf("city %s\n", column);
+                    if(column != ',') strcpy(city.name, column); 
+                    
                 }
                 else if(j == 2){
-                    // printf("acce %s\n", column);
-                    strcpy(city.accentCity, column);
+                    printf("acce %s\n", column);
+                    if(column != ',') strcpy(city.accentCity, column); 
                 }
                 else if(j == 3){
-                    // printf("region %s\n", column);
-                    strcpy(city.region, column);
+                    printf("region %s\n", column);
+                    if(column != ',') strcpy(city.region, column);
                 }
                 else if(j == 4){
-                    // printf("population %s\n", column);
-                    strcpy(city.population, column);
+                    printf("population %s\n", column);
+                    if(column != ',') strcpy(city.population, column);
                 }
                 else if(j == 5){
-                    // printf("lat %s\n", column);
-                    city.latitude = atof(column);
+                    printf("lat %s\n", column);
+                    if(column != ',') strcpy(city.latitude, column);
                 }
                 else if(j == 6){
-                    // printf("long %s\n", column);
-                    city.longitude = atof(column);
+                    printf("long %s\n", column);
+                    if(column != ',') strcpy(city.longitude, column);
                 }
 
                 column = strtok(NULL, ",");
@@ -92,6 +93,8 @@ void criaArquivoBinarioIndexadoOrdenado(FILE *arquivo){  setlocale(LC_ALL, "Port
             }
         }
         i++;
+
+        // printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %s\nLatitude: %s\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
 
 	    fwrite(&city, sizeof(CITY), 1, arquivoBinario);
     }
@@ -149,7 +152,7 @@ void mostraItem(long posicao){
 
     fread(&city, sizeof(CITY), 1, arquivoDados);
     fclose(arquivoDados);
-    printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %f\nLatitude: %f\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
+    printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %s\nLatitude: %s\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
 
 
 }
@@ -215,7 +218,7 @@ void exibeDadosArquivoBinario(){  setlocale(LC_ALL, "Portuguese");
 
 
         // printf("%d\n", city.id);
-        printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %f\nLatitude: %f\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
+        printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %s\nLatitude: %s\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
     }
 
     printf("-------------------------------------------");
