@@ -193,8 +193,8 @@ void pesquisaBinariaSimples(){
             if(id < city.id){
                 fim = meio - 1;
             }else{
-
-                while(1){
+                int controller = 1;
+                while(controller){
 
                     printf("\nEscolha uma das opções para pesquisar: \n\n");
                     printf("------------------------------------------------------\n");
@@ -219,7 +219,7 @@ void pesquisaBinariaSimples(){
                     switch ( valor ){
                         case 1 :
                             if(city.population != NULL){
-                                printf("\t***Resposta: São %s habitantes\n", city.population);
+                                printf("\t***Resposta: São %s MIL habitantes\n", city.population);
                             }else{
                                 printf("\t***Resposta: O número de habitantes não consta no registro! \n");
                             }
@@ -250,6 +250,7 @@ void pesquisaBinariaSimples(){
                             break;
 
                         case 0:
+                            controller = 0;
                             break;
                     }
                 }
@@ -452,7 +453,7 @@ void mostraItem(long posicao){
 
     fread(&city, sizeof(CITY), 1, arquivoDados);
     fclose(arquivoDados);
-    printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %f\nLatitude: %f\n\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
+    printf("Id: %d\nCidade: %s\nPaís: %s\nRegião: %s\nSotaque: %s\nPopulação: %s\nLongitude: %f\nLatitude: %f\n", city.id, city.name, city.region, city.accentCity, city.population, city.longitude, city.latitude);
 
 
 }
@@ -489,7 +490,6 @@ void pesquisaBinariaIndex(){
                 fim = meio - 1;
             }else{
                 mostraItem(index.posicao);
-                // printf("\t%d\n", index.id);
                 break;
             }
         }
